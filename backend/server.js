@@ -2,6 +2,7 @@ import express from "express";
 import authRoutes from "./routes/authroutes.js"
 import dotenv from "dotenv";
 import connectMongoDB from "./bd/connectMongoDB.js";
+import cookieParser from "cookie-parser";
 
 dotenv.config();
 
@@ -11,6 +12,7 @@ const PORT = process.env.PORT;
 app.use(express.json()); // Middleware to parse JSON req.body
 app.use(express.urlencoded({extended: true})); // Middleware to parse form data URL-encoded 
 
+app.use(cookieParser()); // Middleware to parse cookies from the request headers
 
 app.use("/api/auth", authRoutes);
 
