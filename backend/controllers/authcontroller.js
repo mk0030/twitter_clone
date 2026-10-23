@@ -1,7 +1,64 @@
+import User from "../models/userModel.js";
+import bcrypt from "bcryptjs";
+import {generateTokenAndSetCookie} from "../lib/utils/generateToken.js";
+
 export const signup = async (req, res) =>{
-    res.json({
-        data:"You hit the signup endpoint"
-    });
+    try{
+        const {username, fullName, password, email} = req.body;
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if(!emailRegex.test(email)){
+            return res.status(400).json({error: "Invalid email format"});
+        }
+
+        const existingUser = await User.findOne({username});
+        if(existingUser){
+            return res.status(400).json({error: "Username already exists"});
+        }
+
+        const existingEmail = await User.findOne({email});
+        if(existingEmail){
+            return res.status(400).json({error: "Email already exists"});
+        }
+
+        if(password.length < 6){
+            return res.status(400).json({error: "Password must be at least 6 characters long"});
+        }
+
+        //hash password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        const newUser = new User({
+            username,
+            fullName,
+            password: hashedPassword,
+            email
+        });
+        if(newUser){
+            generateTokenAndSetCookie(newUser._id, res);
+            await newUser.save();
+            res.status(201).json({
+                message: "User created successfully",
+                user: {
+                    id: newUser._id,
+                    username: newUser.username,
+                    fullName: newUser.fullName,
+                    email: newUser.email,
+                    followers: newUser.followers,
+                    following: newUser.following,
+                    profileImg: newUser.profileImg,
+                    coverImg: newUser.coverImg,
+                    bio: newUser.bio
+                }
+            });
+        }else{
+            res.status(400).json({error: "Failed to create user"});
+        }
+    }catch(error){
+        console.log("Error in signup:", error);
+        res.status(500).json({error: "Internal server error"});
+    }
 };
 
 export const login = async (req, res) =>{
