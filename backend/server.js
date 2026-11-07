@@ -19,7 +19,7 @@ cloudinary.config({
 const app = express();
 const PORT = process.env.PORT;
 
-app.use(express.json()); // Middleware to parse JSON req.body
+app.use(express.json({limit: "5mb"})); // Middleware to parse JSON req.body
 app.use(express.urlencoded({extended: true})); // Middleware to parse form data URL-encoded 
 
 app.use(cookieParser()); // Middleware to parse cookies from the request headers
