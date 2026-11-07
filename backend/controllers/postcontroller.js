@@ -15,7 +15,7 @@ export const createPost = async (req, res) => {
         }
 
         if(!text && !img) {
-            return res.status(400).json({message: "Post must contain text or image"});
+            return res.status(400).json({error: "Post must contain text or image"});
         }
 
         if(img){
@@ -30,7 +30,7 @@ export const createPost = async (req, res) => {
         })
 
         await newPost.save();
-        res.status(201).json({message: "Post created successfully", post: newPost});
+        res.status(201).json(newPost);
     }catch (error) {
         res.status(500).json({error: "Internal server error"});
         console.error("Error in createPost:", error);
