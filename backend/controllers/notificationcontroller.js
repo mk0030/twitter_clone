@@ -12,7 +12,7 @@ export const getNotifications = async (req, res) => {
 
         await Notification.updateMany({ to: userId}, { read: true });
         
-        res.status(200).json({ notifications });
+        res.status(200).json(notifications);
 
     }catch (error) {
         console.error("Error in getNotifications:", error);
