@@ -32,8 +32,8 @@ const Sidebar = () => {
 		}
 	})
 	
-	const {data} = useQuery({queryKey: ["authUser"]});
-	const authUser = data?.user;
+	const {data:authUser} = useQuery({queryKey: ["authUser"]});
+
 
 	return (
 		<div className='md:flex-[2_2_0] w-18 max-w-52'>
