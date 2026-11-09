@@ -14,7 +14,7 @@ const RightPanel = () => {
 			try{
 				const res = await fetch("/api/users/suggested");
 				const data = await res.json();
-				if(!res.ok) throw new Error(data.message) || "Une erreur est survenue lors de la récupération des utilisateurs suggérés.";
+				if(!res.ok) throw new Error(data.error) || "Une erreur est survenue lors de la récupération des utilisateurs suggérés.";
 				return data;
 			}catch(error){
 				throw new Error(error.message)
