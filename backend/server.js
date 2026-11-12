@@ -24,7 +24,7 @@ app.use(express.urlencoded({extended: true})); // Middleware to parse form data 
 
 app.use(cookieParser()); // Middleware to parse cookies from the request headers
 
-app.use("/api/auth", authRoutes);
+app.use("/api/auth", authRoutes); 
 app.use("/api/users", userRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/notifications", notificationRoutes);

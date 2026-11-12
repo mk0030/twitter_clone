@@ -48,12 +48,12 @@ export const deletePost = async (req, res) => {
             return res.status(401).json({error: "You are not authorized to delete this post"});
         }
 
-        if(post.img) {
+        if(post.img) { //on supprime l'image du post de cloudinary
             const imgId = post.img.split('/').pop().split('.')[0];
             await cloudinary.uploader.destroy(imgId);
         }
 
-        await Post.findByIdAndDelete(req.params.id);
+        await Post.findByIdAndDelete(req.params.id);//on supprime le post 
         res.status(200).json({message: "Post deleted successfully"});
 
     } catch (error) {
@@ -104,14 +104,14 @@ export const likeUnlikePost = async (req, res) => {
             return res.status(404).json({message: "Post not found"});
         }
 
-        const userLikedPost = post.likes.includes(userId);
+        const userLikedPost = post.likes.includes(userId); //savoir si le post est déjà liké
 
         if(userLikedPost) {
             // If the user has already liked the post, remove their like
             await Post.updateOne({_id: postId}, {$pull: {likes: userId}});
             await User.updateOne({_id: userId}, {$pull: {likedPosts: postId}});
 
-            const updatedLikes = post.likes.filter((id) => id.toString() !== userId.toString());
+            const updatedLikes = post.likes.filter((id) => id.toString() !== userId.toString()); //Le post en mémoire contient encore l’ancienne liste (les updateOne ont modifié la base, pas cet objet). Tu recalcules donc la nouvelle liste à la main avec filter, en comparant des strings (le piège du === sur les ObjectId vu plus tôt). Tu renvoies cette liste au front pour qu’il mette à jour le compteur de likes.
             
             res.status(200).json(updatedLikes);
         }else{
@@ -139,11 +139,11 @@ export const likeUnlikePost = async (req, res) => {
 
 export const getAllPosts = async (req, res) => {
     try {
-        const posts = await Post.find().sort({createdAt: -1}).populate({
+        const posts = await Post.find().sort({createdAt: -1}).populate({ //dans un post, user ne contient que l’id de l’auteur. populate va chercher le document correspondant dans la collection users et le substitue à l’id.
             path: "user",
             select: "-password"
         })
-        .populate({
+        .populate({ //Même chose pour les auteurs des commentaires.
             path: "comments.user",
             select: "-password"
         });
@@ -169,7 +169,7 @@ export const getLikedPosts = async (req, res) => {
             return res.status(404).json({message: "User not found"});
         }
 
-        const likedPosts = await Post.find({ _id: { $in: user.likedPosts } })
+        const likedPosts = await Post.find({ _id: { $in: user.likedPosts } }) //dans les posts on cherche tous les posts que l'utilisateur connecté a liké
             .populate({
                 path: "user",
                 select: "-password"
@@ -194,7 +194,7 @@ export const getFollowingPosts = async (req, res) => {
         
         const following = user.following;
 
-        const feedPosts = await Post.find({ user: { $in: following } })
+        const feedPosts = await Post.find({ user: { $in: following } }) //Ici : « trouve tous les posts dont le champ user (l’auteur) fait partie de mes abonnements
             .sort({ createdAt: -1 })
             .populate({
                 path: "user",
@@ -220,7 +220,7 @@ export const getUserPosts = async (req, res) => {
             return res.status(404).json({message: "User not found"});
         }
 
-        const posts = await Post.find({user: user._id})
+        const posts = await Post.find({user: user._id})//on cherche les posts de l'utilisateur connecté
             .sort({createdAt: -1})
             .populate({
                 path: "user",

@@ -7,7 +7,10 @@ import { protectRoute } from "../middleware/protectRoute.js";
 
 const router = express.Router();
 
-router.get("/currentuser", protectRoute , getCurrentUser)
+router.get("/currentuser", protectRoute , getCurrentUser) 
+/*La requête passe d’abord par protectRoute. 
+Si tout est bon, next() appelle getCurrentUser, qui trouve req.user déjà rempli. 
+*/
 
 router.post("/signup", signup);
 

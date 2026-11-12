@@ -18,20 +18,21 @@ export const getUserProfile = async (req, res) => {
     }
 
 }
+
 export const followUnfollowUser = async (req, res) => {
     try{
         const { id } = req.params; // ID of the user to follow/unfollow
         const userToFollow = await User.findById(id); // User to follow/unfollow
         const currentUserId = await User.findById(req.user._id); // ID of the currently logged-in user
 
-        if(id === req.user._id.toString()){
+        if(id === req.user._id.toString()){ //req.user._id est un ObjectId, d’où le .toString()
             return res.status(400).json({ error: "You cannot follow/unfollow yourself" });
         }
         if(!userToFollow || !currentUserId){
             return res.status(404).json({ error: "User not found" });
         }
 
-        const isFollowing = currentUserId.following.includes(id);
+        const isFollowing = currentUserId.following.includes(id); //vérification pour savoir si on se suit déja, includes renvoie true ou false
 
         if(isFollowing){
             // Unfollow the user
@@ -63,18 +64,18 @@ export const getSuggestedUsers = async (req, res) => {
     try{
         const userId = req.user._id;
 
-        const usersFollowedByMe = await User.findById(userId).select("following");
+        const usersFollowedByMe = await User.findById(userId).select("following"); //ne charge que le champ following
 
         const users = await User.aggregate([
             { $match: { _id: { $ne: userId }} 
-        },
-        {$sample: { size: 10 }}
+        }, //trouver tous les utilisateurs différents de l'utilisateur connecté
+        {$sample: { size: 10 }}//en choisir 10
         ])
 
-        const filteredUsers = users.filter(user => !usersFollowedByMe.following.includes(user._id));
-        const suggestedUsers = filteredUsers.slice(0, 4);
+        const filteredUsers = users.filter(user => !usersFollowedByMe.following.includes(user._id));//filtrer des 10 utilisateurs choisi ceux que l'utilisateur connecté ne follow pas
+        const suggestedUsers = filteredUsers.slice(0, 4); //en choisir 4
 
-        suggestedUsers.forEach(user => user.password = null);
+        suggestedUsers.forEach(user => user.password = null);//masquer les mots de passe
         res.status(200).json(suggestedUsers);
 
     } catch (error) {

@@ -10,3 +10,8 @@ export const generateTokenAndSetCookie = (userId, res) => {
         maxAge: 15 * 24 * 60 * 60 * 1000 // 15 days in milliseconds
     });
 }
+
+/*Un JSON Web Token est une chaîne de caractères qui sert de « badge d’identité ». 
+Après la connexion, le serveur donne ce badge au navigateur, qui le renvoie à chaque requête. 
+Le serveur peut ainsi savoir qui fait la requête sans redemander le mot de passe.
+*/

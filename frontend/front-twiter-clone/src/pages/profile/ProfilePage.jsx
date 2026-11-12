@@ -35,6 +35,7 @@ const ProfilePage = () => {
 
 	const {data:user, isLoading, refetch, isRefetching} =  useQuery({
 		queryKey:["userProfile"],
+		refetchOnWindowFocus: false,
 		queryFn:async() =>{
 			try {
 				const res = await fetch (`/api/users/profile/${username}`)
@@ -66,6 +67,7 @@ const ProfilePage = () => {
 				if(!res.ok){
 					throw new Error(data.error || "Quelque chose s'est mal passé")
 				}
+				console.log(data)
 				return data
 			} catch (error) {
 				throw new Error(error.message)
@@ -183,10 +185,12 @@ const ProfilePage = () => {
 								{(coverImg || profileImg) && (
 									<button
 										className='btn btn-primary rounded-full btn-sm text-white px-4 ml-2'
-										onClick={async () => {await updateProfile()
+										onClick={async () => {
+											await updateProfile()
 											setProfileImg(null);
-											setCoverImg(null)
+											setCoverImg(null);
 										}}
+											
 									>
 										{isUpdatingProfile? "Modification..." : "Modifier"}
 									</button>

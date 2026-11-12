@@ -40,7 +40,16 @@ const LoginPage = () => {
 			}
 		},
 		onSuccess: () => {
-			queryClient.invalidateQueries({queryKey: ["authUser"]});
+			queryClient.invalidateQueries({queryKey: ["authUser"]}); 
+		/* Au chargement de l’appli, App.jsx a fait la requête ["authUser"]
+		À ce moment-là, tu n’étais pas connecté, donc le backend a répondu une erreur et 
+		ta queryFn a renvoyé null. React Query a alors mis ce null en cache sous la clé ["authUser"]
+		Ensuite, tu te connectes avec succès. Le cookie jwt est posé, mais le cache, lui, contient toujours null.
+		React Query ne sait pas que quelque chose a changé côté serveur : il n’est pas au courant du login. 
+		Résultat, dans App.jsx, authUser reste null, et tu es toujours renvoyé vers /login.
+		Cette ligne dit à React Query : « les données de ["authUser"] ne sont plus fiables, refais la requête ».
+		et on retrouve l'auth user
+		*/
 		}
 	})
 
